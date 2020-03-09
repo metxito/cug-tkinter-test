@@ -5,23 +5,29 @@ from tkinter import messagebox
 import BSG_config as bsgcfg
 import BSG_menu_configuration_sql as bsgsql
 
+
 class BSG_menu_configuration: 
     #self._img = PhotoImage(file="resources\information_picto.gif")
 
     def __init__(self, version):
         self.MainVersion = version
         self.current_menu_id = None
-        
+        self.status = ""
+
+
     def __message(self, event):
         self.current_menu_id = self.tree.selection()
-        
+
+
     def __apply_changes(self):
         var = tk.messagebox.askquestion(title="Holi", message="__apply_changes", parent=self.window)
         print (var)
 
+
     def __form_configuration(self):
         var = tk.messagebox.askokcancel(title="Holi", message="Do you want to continue?", parent=self.window)
         print (var)
+
 
     def __refresh_tree(self):
         for i in self.tree.get_children():
@@ -49,6 +55,7 @@ class BSG_menu_configuration:
            
         self.scroll_tree.config(command=self.tree.yview)
 
+
     def __info_reset(self):
         self.info_txt_id.set("")
         self.info_txt_parent_id.set("")
@@ -62,18 +69,26 @@ class BSG_menu_configuration:
         for w in self.info_roles:
             w.set(0)
 
+
     def __show_menu(self, event):
         if self.current_menu_id != None and self.current_menu_id != "" and self.current_menu_id != "new":
             sub_menu = tk.Menu(self.window, tearoff=0)
-            if self.tree.parent(self.current_menu_id) == "":
+            if self.tree.parent(self.current_menu_id) == "" or self.status == "":
                 sub_menu.add_command(label="Add sub element", command=self.__menu_add_sub_element)
             else:
                 sub_menu.add_command(label="Add sub element", command=self.__menu_add_sub_element, state=tk.DISABLED)
-            sub_menu.add_command(label="Delete element", command=self.__menu_delete)
+            if self.status == "":
+                sub_menu.add_command(label="Delete element", command=self.__menu_delete)
+                sub_menu.add_command(label="Edit element", command=self.__menu_edit)
+            else: 
+                sub_menu.add_command(label="Delete element", command=self.__menu_delete, state=tk.DISABLED)
+                sub_menu.add_command(label="Edit element", command=self.__menu_edit, state=tk.DISABLED)
+            
             try:
                 sub_menu.tk_popup(event.x_root, event.y_root, 0)
             finally:
                 sub_menu.grab_release()
+
 
     def __change_status(self, element, newstate):
         try:
@@ -85,16 +100,26 @@ class BSG_menu_configuration:
         except:
             print(element.winfo_class())
 
+
+    def __menu_edit(self):
+        self.status = "edit"
+        self.__info_reset()
+        self.__change_status(self.frame_info, tk.NORMAL)
+        element_into = bsgsql.get_menu_information(self.current_menu_id)
+        self.info_txt_id = element_into.menu_configuration_id
+        self.info_txt_parent_id = element_into.menu_configuration_parent_id
+        self.info_txt_name = element_intro.form_configuration_name
+
     def __menu_add_sub_element(self):
         self.status = "newfromparent"
         self.__info_reset()
         self.__change_status(self.frame_info, tk.NORMAL)
         self.info_txt_parent_id.set(self.current_menu_id)
         
-        
 
     def __menu_delete(self):
         tk.messagebox.showwarning(title="Warning :: TODO", Message="in the TODO list", parent=self.window)
+
 
     def Start(self):
         self.window = tk.Tk()
@@ -135,27 +160,27 @@ class BSG_menu_configuration:
 
         self.info_txt_name = tk.StringVar()
         tk.Label(frame_info, text="Form ").grid(row=4, column=0, sticky="W")
-        tk.Entry(frame_info, text="", textvariable=self.info_txt_name, width=64).grid(row=4, column=1, columnspan=3, sticky="W")
+        tk.Entry(frame_info, text="", textvariable=self.info_txt_name, width=40).grid(row=4, column=1, columnspan=3, sticky="W")
 
 
         self.info_txt_sidename = tk.StringVar()
         tk.Label(frame_info, text="Sidebar name ").grid(row=5, column=0, sticky="W")
-        tk.Entry(frame_info, text="", textvariable=self.info_txt_sidename, width=64).grid(row=5, column=1, columnspan=3, sticky="W")
+        tk.Entry(frame_info, text="", textvariable=self.info_txt_sidename, width=40).grid(row=5, column=1, columnspan=3, sticky="W")
 
         
         self.info_txt_desc = tk.StringVar()
         tk.Label(frame_info, text="Description ").grid(row=6, column=0, sticky="W")
-        tk.Entry(frame_info, text="", textvariable=self.info_txt_desc, width=64).grid(row=6, column=1, columnspan=3, sticky="W")
+        tk.Entry(frame_info, text="", textvariable=self.info_txt_desc, width=40).grid(row=6, column=1, columnspan=3, sticky="W")
 
 
         self.info_txt_desc2 = tk.StringVar()
         tk.Label(frame_info, text="Small description ").grid(row=7, column=0, sticky="W")
-        tk.Entry(frame_info, text="", textvariable=self.info_txt_desc2, width=64).grid(row=7, column=1, columnspan=3, sticky="W")
+        tk.Entry(frame_info, text="", textvariable=self.info_txt_desc2, width=40).grid(row=7, column=1, columnspan=3, sticky="W")
 
 
         self.info_txt_awesome = tk.StringVar()
         tk.Label(frame_info, text="Awesome icon ").grid(row=8, column=0, sticky="W")
-        tk.Entry(frame_info, text="", textvariable=self.info_txt_awesome, width=32).grid(row=8, column=1, columnspan=2, sticky="W")
+        tk.Entry(frame_info, text="", textvariable=self.info_txt_awesome, width=30).grid(row=8, column=1, columnspan=2, sticky="W")
 
 
         tk.Label(frame_info, text="Reset Parameters ").grid(row=9, column=0, sticky="W")

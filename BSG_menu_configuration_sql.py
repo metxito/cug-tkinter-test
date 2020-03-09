@@ -40,5 +40,44 @@ def get_menu_configuration():
     return cursor
 
 
-def get_menu_information():
-    print("hola")
+
+def get_menu_information(menu_configuration_id):
+    CockpitConn = pyodbc.connect(bsgcfg.sql_cockpit_connection)
+    cursor = CockpitConn.cursor()
+    print("SELECT " +
+    "     [menu_configuration_id] " +
+    "    ,[menu_configuration_parent_id] " +
+    "    ,[form_configuration_name] " +
+    "    ,[menu_configuration_sidebar_name] " +
+    "    ,[menu_configuration_description_big] " +
+    "    ,[menu_configuration_description_small] " +
+    "    ,[menu_configuration_font_awesome_icon] " +
+    "    ,[menu_configuration_reset_parameters] " +
+    "    ,[menu_configuration_visible] " +
+    "    ,[configurator_relevant] " +
+    "    ,[menu_configuration_role] " +
+    "    ,[menu_configuration_menu_id_parent] " +
+    "    ,[modified_by] " +
+    "    ,[modified_on] " +
+    "FROM [cockpit].[menu_configuration] " +
+    "WHERE [menu_configuration_id] = " + str(menu_configuration_id)
+    )
+    cursor.execute("SELECT " +
+    "     [menu_configuration_id] " +
+    "    ,[menu_configuration_parent_id] " +
+    "    ,[form_configuration_name] " +
+    "    ,[menu_configuration_sidebar_name] " +
+    "    ,[menu_configuration_description_big] " +
+    "    ,[menu_configuration_description_small] " +
+    "    ,[menu_configuration_font_awesome_icon] " +
+    "    ,[menu_configuration_reset_parameters] " +
+    "    ,[menu_configuration_visible] " +
+    "    ,[configurator_relevant] " +
+    "    ,[menu_configuration_role] " +
+    "    ,[menu_configuration_menu_id_parent] " +
+    "    ,[modified_by] " +
+    "    ,[modified_on] " +
+    "FROM [cockpit].[menu_configuration] " +
+    "WHERE [menu_configuration_id] = " + str(menu_configuration_id)
+    )
+    return cursor
