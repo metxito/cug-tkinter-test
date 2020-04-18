@@ -15,16 +15,41 @@ class BSG_menu_configuration:
         self.status = ""
 
 
-    def __message(self, event):
-        self.current_menu_id = self.tree.selection()
+    def __select_menu(self, event):
+        self.current_menu_id = int(self.tree.selection()[0])
+        self.__update_menu_info()
+    
+    def __update_menu_info(self):
+        if (self.current_menu_id != None):
+            print (self.current_menu_id)
+            for row in self.menu_cursor:
+                print (row.menu_configuration_id)
+                if (row.menu_configuration_id == self.current_menu_id):
+                    self.info_txt_id.set(row.menu_configuration_id)
+                    self.info_txt_parent_id.set(row.menu_configuration_parent_id)
+                    self.info_txt_name.set("")
+                    self.info_txt_sidename.set("")
+                    self.info_txt_desc.set("")
+                    self.info_txt_desc2.set("")
+                    self.info_txt_awesome.set("")
+                    self.info_reset.set(1)
+                    self.info_visible.set(1)
+                    for w in self.info_roles:
+                        w.set(0)
 
-
-    def __apply_changes(self):
-        var = tk.messagebox.askquestion(title="Holi", message="__apply_changes", parent=self.window)
+    def __btn_apply(self):
+        var = tk.messagebox.askyesno(title="Cancel", message="Do you want really cancel this operation?", parent=self.window)
         print (var)
+        print (tk.messagebox.YES)
+        print (tk.messagebox.NO)
 
 
-    def __form_configuration(self):
+    def __btn_cancel(self):
+        if (tk.messagebox.askyesno(title="Cancel", message="Do you really want to cancel this operation?", parent=self.window)):
+            self.__info_reset()
+            
+
+    def __btn_get_form(self):
         var = tk.messagebox.askokcancel(title="Holi", message="Do you want to continue?", parent=self.window)
         print (var)
 
@@ -34,8 +59,8 @@ class BSG_menu_configuration:
             self.tree.delete(i)
         self.current_menu_id = None
         try:
-            cursor = bsgsql.get_menu_configuration()
-            for row in cursor:
+            self.menu_cursor = bsgsql.get_menu_configuration()
+            for row in self.menu_cursor:
                 try:
                     self.tree.insert(
                         row.menu_configuration_parent_id, 
@@ -57,6 +82,7 @@ class BSG_menu_configuration:
 
 
     def __info_reset(self):
+        self.status = ""
         self.info_txt_id.set("")
         self.info_txt_parent_id.set("")
         self.info_txt_name.set("")
@@ -68,6 +94,7 @@ class BSG_menu_configuration:
         self.info_visible.set(1)
         for w in self.info_roles:
             w.set(0)
+        self.__change_status(self.frame_info, tk.DISABLED)
 
 
     def __show_menu(self, event):
@@ -90,15 +117,24 @@ class BSG_menu_configuration:
                 sub_menu.grab_release()
 
 
-    def __change_status(self, element, newstate):
+    def __change_status(self, element, tk_state):
         try:
             if (element.winfo_class() != "Frame"):
-                element.configure(state=newstate)
+                element.configure(state=tk_state)
             else:
                 for child in element.winfo_children():
-                    self.__change_status(child, newstate)
+                    self.__change_status(child, tk_state)
         except:
             print(element.winfo_class())
+
+
+    def __menu_add_sub_element(self):
+        self.status = "newfromparent"
+        self.__info_reset()
+        self.__change_status(self.frame_info, tk.NORMAL)
+        self.info_txt_parent_id.set(self.current_menu_id)
+        self.info_txt_parent_id_control.configure(state=tk.DISABLED)
+        self.info_btn_form.configure(state=tk.DISABLED)
 
 
     def __menu_edit(self):
@@ -110,12 +146,6 @@ class BSG_menu_configuration:
         self.info_txt_parent_id = element_into.menu_configuration_parent_id
         self.info_txt_name = element_intro.form_configuration_name
 
-    def __menu_add_sub_element(self):
-        self.status = "newfromparent"
-        self.__info_reset()
-        self.__change_status(self.frame_info, tk.NORMAL)
-        self.info_txt_parent_id.set(self.current_menu_id)
-        
 
     def __menu_delete(self):
         tk.messagebox.showwarning(title="Warning :: TODO", Message="in the TODO list", parent=self.window)
@@ -149,13 +179,12 @@ class BSG_menu_configuration:
         self.info_txt_id = tk.StringVar()
         tk.Label(frame_info, text="ID ").grid(row=2, column=0, sticky="W")
         tk.Entry(frame_info, text="", textvariable=self.info_txt_id, width=10).grid(row=2, column=1, sticky="W")
-        tk.Label(frame_info, text=".").grid(row=2, column=2, sticky="E")
-        tk.Label(frame_info, text=".").grid(row=2, column=3, sticky="E")
 
 
         self.info_txt_parent_id = tk.StringVar()
         tk.Label(frame_info, text="Parent ID ").grid(row=3, column=0, sticky="W")
-        tk.Entry(frame_info, text="", textvariable=self.info_txt_parent_id, width=10).grid(row=3, column=1, sticky="W")
+        self.info_txt_parent_id_control = tk.Entry(frame_info, text="", textvariable=self.info_txt_parent_id, width=10)
+        self.info_txt_parent_id_control.grid(row=3, column=1, sticky="W")
 
 
         self.info_txt_name = tk.StringVar()
@@ -206,14 +235,16 @@ class BSG_menu_configuration:
 
 
         tk.Label(frame_info, text=" ").grid(row=12, column=0, sticky="W")
-        tk.Label(frame_info, text=" ").grid(row=13, column=0, sticky="W")
-        self.info_btn_apply = tk.Button (frame_info, text=" Update Configuration ", command = self.__apply_changes)
-        self.info_btn_apply.grid(row=14, column=1, columnspan=4, sticky="W")
+        self.info_btn_apply = tk.Button (frame_info, text=" Update ", command = self.__btn_apply)
+        self.info_btn_apply.grid(row=13, column=2, columnspan=1, sticky="W")
+        self.info_btn_cancel = tk.Button (frame_info, text=" Cancel ", command = self.__btn_cancel)
+        self.info_btn_cancel.grid(row=13, column=3, columnspan=1, sticky="E")
 
 
+        tk.Label(frame_info, text=" ").grid(row=14, column=0, sticky="W")
         tk.Label(frame_info, text=" ").grid(row=15, column=0, sticky="W")
-        self.info_btn_form = tk.Button (frame_info, text=" Form Configuration ", command = self.__form_configuration)
-        self.info_btn_form.grid(row=16, column=1, columnspan=4, sticky="W")
+        self.info_btn_form = tk.Button (frame_info, text=" Form Configuration ", command = self.__btn_get_form)
+        self.info_btn_form.grid(row=16, column=2, columnspan=2, sticky="E")
         
 
         self.frame_info = frame_info
@@ -235,7 +266,7 @@ class BSG_menu_configuration:
         self.tree.heading("VS", text="Visible")   
         self.tree.heading("RP", text="Reset parameters")   
 
-        self.tree.bind('<<TreeviewSelect>>', self.__message)
+        self.tree.bind('<<TreeviewSelect>>', self.__select_menu)
         self.tree.bind("<Button-3>", self.__show_menu)
 
         #self.s = ttk.Style()
