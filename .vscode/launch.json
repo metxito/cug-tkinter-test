@@ -5,10 +5,17 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Main",
             "type": "python",
             "request": "launch",
-            "program": "BSG_cockpit_appl.py",
+            "program": "BSG_main.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "test 02 tabs",
+            "type": "python",
+            "request": "launch",
+            "program": "test_02_tabs.py",
             "console": "integratedTerminal"
         }
     ]
