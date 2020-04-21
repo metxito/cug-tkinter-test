@@ -8,9 +8,6 @@ class bsg_form_connect:
     
     def __init__(self, tktab):
         self.mainTab = tktab
-
-    def make_gui(self):
-
         self.main_frame = tk.Frame(self.mainTab)
         self.main_frame.pack(side=tk.TOP, expand=0, padx=3, pady=100)
 

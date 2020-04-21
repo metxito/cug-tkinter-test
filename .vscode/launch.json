@@ -8,7 +8,7 @@
             "name": "Main",
             "type": "python",
             "request": "launch",
-            "program": "BSG_main.py",
+            "program": "main.py",
             "console": "integratedTerminal"
         },
         {
@@ -16,6 +16,20 @@
             "type": "python",
             "request": "launch",
             "program": "test_02_tabs.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "test 03 table edit",
+            "type": "python",
+            "request": "launch",
+            "program": "test_03_table_edit.py",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "test 04 bsgtable",
+            "type": "python",
+            "request": "launch",
+            "program": "test_04_bsgtable.py",
             "console": "integratedTerminal"
         }
     ]
