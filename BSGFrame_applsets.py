@@ -66,7 +66,7 @@ class bsgframe_applsets:
                 else:
                     cwidth = xc["width"]
 
-            cwidthtext = int(cwidth/7)
+            cwidthtext = int(cwidth/6)
             self.treeview.configure(selectmode=tk.NONE)
             entryedit = tk.StringVar()
             entryedit.set(item_values[c-1])
@@ -82,7 +82,7 @@ class bsgframe_applsets:
                     ch.configure(state=tk.NORMAL)
                 self.dobleblick = 1
             ok_button = ttk.Button(self.main_frame, text='OK', width=4, command=saveedit)
-            ok_button.place(x=cposx+cwidth-(4*7), y=2+r*20)
+            ok_button.place(x=cposx+cwidth-(4*6), y=2+r*20)
         else:
             pass
 

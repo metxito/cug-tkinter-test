@@ -5,10 +5,20 @@ from tkinter import messagebox
 
 class BSGTable:
 
+
     def refresh(self):
         for i in self.table.get_children():
             self.table.delete(i)
-        data = self.pop_f()
+        data = self.populate_function()
+        self.original_data = []
+        i = 1
+        for row in data:
+            record = {}
+            record['id'] = i 
+            for c in self.table_definion['columns']:
+                record['values'][c['name']] = row[c['name']]
+            i += 1
+
         for row in data:
             self.table.insert("", row['id'], text=row['id'], values=row['values'], open=True)
 
@@ -25,9 +35,36 @@ class BSGTable:
                 regextest = re.compile(regex, re.I)
                 match = regextest.match(str(newvalue))
                 if bool(match) != True:
-                    messagebox.showerror("Wrong entry", "The new value is not valid")
+                    messagebox.showerror("Wrong entry", ("The new value is not valid. It should match with the regular expression: " + regex))
                     return
-            self.upd_f(id, column, newvalue)
+            self.populate_function(id, column, newvalue)
+            stop_edit()
+            self.refresh()
+        def Key(event):
+            if event.char == '\x1b':
+                stop_edit()
+            if event.char == '\r':
+                save_edit()
+
+        entryedit = tk.StringVar()
+        entryedit.set(value)
+        txtentryedit = tk.Entry(self.parent, text="", textvariable=entryedit, width=textsize)
+        txtentryedit.place(x=pos['x'], y=pos['y'])
+        txtentryedit.bind("<Key>", Key)
+
+    def edit_integer (self, id, column, value, pos, size, textsize):
+        def stop_edit():
+            txtentryedit.destroy()
+            self.table.configure(selectmode=tk.BROWSE)
+            self.dobleblick = 1
+        def save_edit():
+            newvalue = entryedit.get()
+            regextest = re.compile('^[0-9]*$', re.I)
+            match = regextest.match(str(newvalue))
+            if bool(match) != True:
+                messagebox.showerror("Wrong entry", "The new value is not valid integer")
+                return
+            self.populate_function(id, column, newvalue)
             stop_edit()
             self.refresh()
         def Key(event):
@@ -50,7 +87,7 @@ class BSGTable:
         #    self.dobleblick = 1
         #def save_edit():
         #    newvalue = entryedit.get()
-        #    self.upd_f(id, column, newvalue)
+        #    self.populate_function(id, column, newvalue)
         #    stop_edit()
         #    self.refresh()
         #def Key(event):
@@ -111,14 +148,9 @@ class BSGTable:
 
 
         if column['edit'] == "text":
-            self.edit_text (
-                id, 
-                column['name'],
-                value, 
-                pos,
-                size,
-                textsize,
-                regex)
+            self.edit_text (id, column['name'], value, pos, size, textsize, regex)
+        elif column['edit'] == "integer":
+                self.edit_integer (id, column['name'], value, pos, size, textsize)
 
 
 
@@ -128,9 +160,9 @@ class BSGTable:
     def __init__ (self, parent_frame, table_definition, populate_function, update_function, delete_function):
         self.table_definion = table_definition
         self.parent = parent_frame
-        self.pop_f = populate_function
-        self.upd_f = update_function
-        self.del_f = delete_function
+        self.populate_function = populate_function
+        self.populate_function = update_function
+        self.populate_function = delete_function
 
         
         self.columns = []
